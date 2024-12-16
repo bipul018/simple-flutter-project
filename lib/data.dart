@@ -106,7 +106,7 @@ class DogStore {
       // Use a `where` clause to delete a specific dog.
       where: 'id = ?',
       // Pass the Dog's id as a whereArg to prevent SQL injection.
-      whereArgs: [id],
+      whereArgs: [id],/**/
     );
     
     await _notify_subscribers();

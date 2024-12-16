@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'navigator.dart';
 import 'data.dart';
-
+import 'cam_cntrl.dart';
 
 class CameraScreen extends StatelessWidget{
   const CameraScreen(title, {super.key}): this.title = title[0]+": Camera";
@@ -14,35 +14,36 @@ class CameraScreen extends StatelessWidget{
       appBar: AppBar(title: Text(title)),
       body : //Container(height: 50, child:Center(child:const Text("I'm from camera"))),
       //FutureBuilder<List<String>> (
-      StreamBuilder<List<Dog>> (
-        //future: get_dogs(),
-        stream: dogstore.subscribe(),
-        builder: (cxt, snap){
-          if(snap.hasData){
-            return ListView(
-              padding: const EdgeInsets.all(8),
-              children: snap.data!.map((dat) => Center(child:Text(dat.toString()))).toList(),
-            );
-          }
-          else if(snap.hasError){
-            return Column(
-              children:[
-                const Icon(
-                  Icons.error_outline,
-                  color: Colors.red,
-                  size: 60,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Text('Error: ${snap.error}'),
-                ),
-            ]);
-          }
-          else{
-            return Column(children: [Expanded(child: CircularProgressIndicator()),
-                Text("Awaiting database results...")]);
-          }
-      }),
+      //StreamBuilder<List<Dog>> (
+      //  //future: get_dogs(),
+      //  stream: dogstore.subscribe(),
+      //  builder: (cxt, snap){
+      //    if(snap.hasData){
+      //      return ListView(
+      //        padding: const EdgeInsets.all(8),
+      //        children: snap.data!.map((dat) => Center(child:Text(dat.toString()))).toList(),
+      //      );
+      //    }
+      //    else if(snap.hasError){
+      //      return Column(
+      //        children:[
+      //          const Icon(
+      //            Icons.error_outline,
+      //            color: Colors.red,
+      //            size: 60,
+      //          ),
+      //          Padding(
+      //            padding: const EdgeInsets.only(top: 16),
+      //            child: Text('Error: ${snap.error}'),
+      //          ),
+      //      ]);
+      //    }
+      //    else{
+      //      return Column(children: [Expanded(child: CircularProgressIndicator()),
+      //          Text("Awaiting database results...")]);
+      //    }
+      //}),
+      CameraBox(),
       persistentFooterButtons: [Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: get_buttons(cxt),

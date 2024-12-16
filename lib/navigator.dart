@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'camera_screen.dart';
 import 'settings_screen.dart';
-
+import 'web_screen.dart';
 
 Map<String, (IconData, dynamic Function(List))> get_screens(){
   return <String, (IconData, dynamic Function(List))>{
+    '/web' : (Icons.web, (List args) => WebScreen(args)),
     '/' : (Icons.home, (List args) => HomeScreen(args)),
     '/settings' : (Icons.settings, (List args) => SettingsScreen(args)),
     '/camera' : (Icons.camera, (List args) => CameraScreen(args)),
+
   };
 }
 
