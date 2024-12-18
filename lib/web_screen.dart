@@ -12,38 +12,6 @@ import 'dart:typed_data';
 import 'request_maker.dart';
 import 'task_items.dart';
 
-// Make a class type thingy,
-// That takes in a list of items,
-// With name, type (null | string | int | video file)
-// Then a builder kind of func that makes a list of form fields
-// based on those items
-// Then you make a list of such class type thingies
-// That you use to submit a post request thingy
-// Which you then print to a snackbar
-
-
-Future<String> fetchData(Uri url) async {
-  //final response = await http.get(Uri.parse('https://fast.com'));
-  //final response = await http.get(Uri.parse(url));
-  final response = await http.get(url).timeout(
-    const Duration(seconds: 10),
-    onTimeout: () => throw TimeoutException("Connection timed out"),
-  );
-
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    String data = response.body;
-    //print(data); // Or do something more useful with the data
-    print("Data was received of length : ${data.length}");
-    return data;
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load data with status: ${response.statusCode}');
-  }
-}
-
 class WebScreen extends StatefulWidget{
   WebScreen(title, {super.key}): title = title[0]+": Web";
   final String title;
