@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:video_player/video_player.dart';
 import 'navigator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 import 'request_maker.dart';
 import 'task_items.dart';
 
@@ -54,6 +59,9 @@ class _WebScreenState extends State<WebScreen> {
   //Future<DynamicApiService>? _apiService=null;
 
   var _current_task = task_items[4];
+
+  String _responseText = "";
+  VideoPlayerController? _vid_player = null;
   
   @override
   void initState(){
@@ -161,7 +169,7 @@ class _WebScreenState extends State<WebScreen> {
               )
             ).toList()
           ),
-          Expanded(child:RequestObject(
+          RequestObject(
             base_builder: (){
               final url = _url;
               if(url == null){
@@ -180,14 +188,78 @@ class _WebScreenState extends State<WebScreen> {
             //  (field_name: "phone", type:RequestUnitType.integer, nullable:true),
             //],
             on_submit: (response)async{
-              ScaffoldMessenger.of(cxt).showSnackBar(
-                SnackBar(
-                  content: Text("Yes, the answer of request is ${response.body}"),
-                  backgroundColor: Colors.blue,
-                ));
+              _responseText = "";
+
+              final Map<String, dynamic> jsonresp = json.decode(response.body);
+              setState(() => {});
+              
+              // TODO:: Disable video player controller aka _vid_player
+
+              if(jsonresp['status'] is String){
+                if(jsonresp['status'].toLowerCase() == "error"){
+                  ScaffoldMessenger.of(cxt).showSnackBar(
+                    SnackBar(
+                      content: Text("The task resulted in an error!!"),
+                      backgroundColor: Colors.blue,
+                  ));
+                } else {
+                  ScaffoldMessenger.of(cxt).showSnackBar(
+                    SnackBar(
+                      content: Text("The task was completed successfully!!"),
+                      backgroundColor: Colors.blue,
+                  ));
+                }
+              } else {
+                throw Exception("Expected string as status of task response");
+              }
+
+              final val = jsonresp['value'];
+
+              if((val is Map<String, dynamic>) && val.containsKey("type")){
+                if(val["type"].toLowerCase() == "video/mp4"){
+                  if(val.containsKey("bytes")){
+                    // Setup video controller
+                    // Decode base64 video bytes
+                    Uint8List videoBytes = base64.decode(val["bytes"]);
+
+                    // Create a temporary file to store the video
+                    final tempDir = await getTemporaryDirectory();
+                    final tempFile = File('${tempDir.path}/video.mp4');
+                    await tempFile.writeAsBytes(videoBytes);
+
+                    // Try making a uri first then play video for potential web support
+                    // TODO:: check if for windows need to make special case or not
+                    final file_uri = Uri.file(tempFile.path);
+
+                    // Initialize video player
+                    _vid_player = VideoPlayerController.contentUri(file_uri)
+                    //_vid_player = VideoPlayerController.file(tempFile)
+                      ..initialize().then((_) {
+                        setState(() {});
+                        _vid_player?.play();
+                      });
+                  } else{
+                    throw Exception("Expected `bytes` field for video type");
+                  }
+                } else {
+                  throw Exception("Unknown type ${val['type']} in json response");
+                }
+              } else {
+                // Setup text printing
+                _responseText = "${val}";
+              }
+              setState(()=>{});                  
+              // check if value is a string/ dict
+              // if dict, check if the value has a video
+              // if video, play video just below this form, else print the text of this form
+              
+              
             }
-        ))
-      ]),
+        ),
+        Expanded(child:((_vid_player == null) || (!_vid_player!.value.isInitialized))?Text(_responseText):
+        AspectRatio(aspectRatio: _vid_player!.value.aspectRatio,
+          child: VideoPlayer(_vid_player!))),
+    ]),
       persistentFooterButtons: [Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: get_buttons(cxt),

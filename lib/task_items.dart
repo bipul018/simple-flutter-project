@@ -13,6 +13,10 @@ const task_items = [
     ]
   ),
   (
+      endpoint: "task/get_video",
+      request_fields: <RequestInputType>[]
+  ),
+  (
     endpoint: "task/restore_video",
     request_fields : <RequestInputType>[
     ]
